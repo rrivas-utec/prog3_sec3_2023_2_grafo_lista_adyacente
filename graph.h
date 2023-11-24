@@ -12,6 +12,9 @@
 #include <vector>
 #include <algorithm>
 #include <limits>
+#include <queue>
+#include <stack>
+#include <unordered_set>
 
 namespace utec {
     template <typename KeyType, typename ValueType, typename WeightType>
@@ -23,6 +26,24 @@ namespace utec {
         // Atributos
         std::unordered_map<KeyType, ItemType> vertices;
         std::vector<AdjancentListType> buckets;
+
+        KeyType get_key(size_t index) {
+            auto it = std::find_if(
+                    std::begin(vertices), std::end(vertices),
+                    [index](auto vx) {
+                        return vx.second.first == index;
+                    });
+            if (it != std::end(vertices)) {
+                return it->first;
+            }
+            return KeyType{};
+        }
+        auto get_not_visited(const auto& adj, const auto& visited) {
+            return std::find_if (
+                    std::begin(adj), std::end(adj),
+                    [&visited](auto item) { return !visited.contains(item.first);
+                    });
+        }
     public:
         graph() = default;
 
@@ -72,6 +93,52 @@ namespace utec {
 
         template <typename UnaryFunction>
         void bfs(KeyType key, UnaryFunction fn) {
+            std::queue<size_t> q;
+            std::unordered_set<size_t> visited;
+            // El vertice seleccionando
+            auto idx = vertices[key].first;
+            // Agregar el vertice seleccionado al queue y visited
+            q.push(idx);
+            visited.insert(idx);
+            // Paso # 2
+            while (!q.empty()) {
+                // Paso # 3
+                idx = q.front();
+                auto k = get_key(idx);
+                fn(k);
+                // Paso # 4
+                q.pop();
+                // Paso # 5
+                for (const auto& adj: buckets[idx])
+                    if (visited.insert(adj.first).second) q.push(adj.first);
+            }
+        }
+        template <typename UnaryFunction>
+        void dfs(KeyType key, UnaryFunction fn) {
+            // Estructuras
+            std::stack<size_t> s;
+            std::unordered_set<size_t> visited;
+            // El vertice seleccionando
+            auto idx = vertices[key].first;
+            // Agregar el vertice seleccionado al stack y visited
+            s.push(idx);
+            visited.insert(idx);
+            while (!s.empty()) {
+                // Paso # 3
+                auto actual = s.top();
+                // Paso # 4
+                auto adj = buckets[actual];
+                auto it = get_not_visited(adj, visited);
+                if (it != std::end(adj)) { // No visitado
+                    s.push(it->first);
+                    visited.insert(it->first);
+                }
+                else {
+                    fn(get_key(actual));
+                    s.pop();
+                }
+
+            }
 
         }
     };

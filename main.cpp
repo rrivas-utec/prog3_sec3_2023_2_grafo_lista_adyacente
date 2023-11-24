@@ -12,17 +12,24 @@ void ejemplo_1() {
     g1.push_edge({'A','B', 1});
     g1.push_edge({'A','C', 4});
     g1.push_edge({'A','D', 3});
-    g1.push_edge({'C','D', 6});
+//    g1.push_edge({'C','D', 6});
+    g1.push_edge({'C', 'E', 1});
+    g1.push_edge({'E', 'F', 1});
+    g1.push_edge({'E', 'G', 1});
     // Retornar los valores de los vertices
     std::cout << g1.get_vertex('A') << std::endl;
     std::cout << g1.get_vertex('C') << std::endl;
     // Retornar los pesos de la aristas
     std::cout << g1.get_edge('A', 'B') << std::endl;
     std::cout << g1.get_edge('C', 'A') << std::endl;
-    std::cout << g1.get_edge('D', 'B') << std::endl;
+//    std::cout << g1.get_edge('D', 'B') << std::endl;
 
     g1.bfs('A', [](auto item) {
-        std::cout << item.first << " " << item.second << std::endl;
+        std::cout << item << std::endl;
+    });
+    std::cout << "----\n";
+    g1.dfs('A', [](auto item) {
+        std::cout << item << std::endl;
     });
 
 
